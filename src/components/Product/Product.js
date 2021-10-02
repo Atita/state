@@ -21,29 +21,32 @@ const products = [
 
 export default class Product extends Component {
 
-
     state = {
         cart: [],
-        total: 0
       }
-    
+ 
 
       remove = (product) => {
         this.setState(state => {
           const cart = [...state.cart];
-          cart.splice(cart.indexOf(product.name))
+          const productIndex =cart.findIndex(p=> p.name === product.name);
+          if (productIndex < 0) {
+               return;
+          }
+
+          cart.splice(productIndex, 1)
+
           return ({
-            cart,
-            total: state.total - product.price
+            cart
+           
           })
         })
       }
 
       add = (product) => {
         this.setState(state => ({
-          cart: [...state.cart, product.name],
-          total: state.total + product.price
-        }))
+          cart: [...state.cart, product],
+         }))
       }
 
       currencyOptions = {
@@ -52,7 +55,8 @@ export default class Product extends Component {
       }
     
       getTotal = () => {
-        return this.state.total.toLocaleString(undefined, this.currencyOptions)
+          const total = this.state.cart.reduce((totalCost,item)=> totalCost + item.price, 0);
+          return total.toLocaleString(undefined, this.currencyOptions)
       }
 
   render() {
@@ -66,7 +70,7 @@ export default class Product extends Component {
           {products.map(product => (
             <div key={product.name}>
         
-        
+     
 
         <div className="product"><span role="img" aria-label={product.name}>{product.emoji}</span></div>
         <button  onClick={() => this.add(product)}>Add</button> <button onClick={() => this.remove(product)}>Remove</button>
